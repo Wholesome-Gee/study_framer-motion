@@ -25,3 +25,11 @@ react-query (React v18 이하에서 구동) : npm i react-query
 ### #8.1
 
 **📗framer-motion으로 div에 animation을 적용하려면 \<motion.div>**
+
+---
+
+### #8.2
+
+**📗style-components에 framer-motion 적용하기**
+
+---

@@ -33,3 +33,7 @@ react-query (React v18 이하에서 구동) : npm i react-query
 **📗style-components에 framer-motion 적용하기**
 
 ---
+
+### #8.3
+
+**📗framer-motion의 Variants 기능으로 애니메이션 코드를 조금 더 깔끔하게 정리하기**

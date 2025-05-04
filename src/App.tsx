@@ -1,5 +1,5 @@
 import styled from "styled-components";
-
+import { motion } from 'framer-motion'
 const Wrapper = styled.div`
   height: 100vh;
   width: 100vw;
@@ -20,6 +20,11 @@ export default function App() {
   return (
     <Wrapper>
       <Box />
+      <motion.div></motion.div>
     </Wrapper>
   );
 }
+
+/*
+div에 애니메이션 적용시킨다면 <motion.div> 라고 작성해야함
+*/

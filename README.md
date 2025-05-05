@@ -57,3 +57,9 @@ react-query (React v18 이하에서 구동) : npm i react-query
 **📗useMotionValue를 사용하여 애니메이션상태를 추적하거나 제어하기**
 
 ---
+
+### #8.8
+
+**📗useTransform을 사용하여 motionValue의 변화에 따른 애니메이션 적용하기**
+
+---

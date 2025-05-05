@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { motion, useMotionValue } from "motion/react"
+import { motion, useMotionValue, useTransform } from "motion/react"
 import { useEffect, useRef } from "react";
 import Variants from "./Variants";
 
@@ -99,11 +99,13 @@ const dragVariant = {
 
 export default function App() {
   const biggerBox = useRef(null)
-  const x = useMotionValue(0)
+  const motionValue = useMotionValue(0)
   // useMotionValue는 framer-motion 요소의 애니메이션 상태를 추적하고 제어한다. 허나, x값이 변한다해서 재렌더링이 일어나진 않음. 기본값은 0   #8.7
+  const scaleTransForm = useTransform(motionValue,[-800,0,800],[0.1,1,2])
+  // useTransform은 motionValue가 -800/0/800일때, 0.1/1/2 를 반환한다.
   useEffect(()=>{
-    x.onChange(()=>console.log(x.get())) // motionValue x값을 받아오는 방법  #8.7
-  },[x])
+    motionValue.onChange(()=>console.log(motionValue.get())) // motionValue x값을 받아오는 방법  #8.7
+  },[motionValue])
   return (
     <FullScreen>
       <Part>
@@ -170,9 +172,15 @@ export default function App() {
       {/* useMotionValue인 x를 Box의 style에 적용함으로써 x는 Box의 animation 상태를 추적하고 컨트롤 할 수 있음.  #8.7 */}
       {/* x.set(300)으로 x(Box의 x축 값)을 300으로 설정하는 버튼  #8.7  */}
         <Title>useMotionValue를 사용하여 motion요소의 애니메이션 상태 관리하기</Title>
-        <Box style={{x}} ></Box> 
-        <button onClick={()=>x.set(300)}>click</button>
+        <Box style={{x:motionValue}}/>
+        <button onClick={()=>motionValue.set(300)}>click</button>
       </Part>  
+      <Part>
+      {/* Box가 x축으로 drag되면? Box의 scale이 커지는 애니메이션 */}
+      {/* drag='x'를 붙혀주어야함. */}
+        <Title>useTransForm을 사용하여 motionValue의 변화에 따른 애니메이션 구현하기</Title>
+        <Box  style={{x:motionValue, scale:scaleTransForm}}/>
+      </Part>
     </FullScreen>
   );
 }

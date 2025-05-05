@@ -43,3 +43,9 @@ react-query (React v18 이하에서 구동) : npm i react-query
 ### #8.4
 
 **📗delayChild, staggerChild로 자식 Component에게 순차적인 애니메이션 딜레이 걸기**
+
+---
+
+### #8.5~8.6
+**📗framer-motion의 whileHover, whileTap 등 while기능으로 이벤트핸들러에 따른 애니메이션 적용하기**
+**📗framer-motion 요소를 드래그하기 및 드래그 가능범위 만들기**

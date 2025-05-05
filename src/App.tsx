@@ -1,62 +1,67 @@
 import styled from "styled-components";
 import { motion, useMotionValue } from "motion/react"
 import { useEffect, useRef } from "react";
+import Variants from "./Variants";
 
-const Wrapper = styled.div`
-  height: 100vh;
-  width: 100vw;
+const FullScreen = styled.div`
+  padding-top: 20px;
+  width: 100%;
+  height: 100%;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
-  gap: 20px;
+`
+const Part = styled.div`
+  margin-bottom: 60px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 `;
 
 // styled-components에 framer-motion을 적용시키는 방법  #8.2
 const Box = styled(motion.div)` 
-  width: 200px;
-  height: 200px;
+  width: 120px;
+  height: 120px;
   display: grid;
   grid-template-columns: repeat(2,1fr);
   border-radius: 10px;
   box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1), 0 10px 20px rgba(0, 0, 0, 0.06);
   background-color: white;
 `;
-const DragBox = styled(motion.div)`
-  width: 200px;
-  height: 200px;
-  border-radius: 10px;
-  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1), 0 10px 20px rgba(0, 0, 0, 0.06);
-  background-color: white;
-`
 const BiggerBox = styled(motion.div)`
-  width: 600px;
-  height: 600px;
-  background-color: rgba(255, 255, 255, 0.4);
+  width: 240px;
+  height: 240px;
   border-radius: 40px;
   display: flex;
   justify-content: center;
   align-items: center;
+  overflow: hidden;
+  background-color: rgba(255, 255, 255, 0.4);
 `
 const Circle = styled(motion.div)`
-  width: 70px;
-  height: 70px;
+  width: 35px;
+  height: 35px;
   border-radius: 50%;
   place-self: center;
   background-color: teal;
 `
+const Title = styled.h1`
+  font-weight: 600;
+  margin-bottom: 10px;
+`
 
-const rotateVariant = {
-  startAnimation: {scale:0},
-  endAnimation: {
+const firstVariants = {
+  start: {scale:0.2},
+  end: {
     scale:1,
     rotateZ:360,
     transition:{
       type:'spring',
-      delay:1.5
+      delay:0.5
     }
   },
 }
-const scaleVariant = {
+const secondVariants = {
   start: {
     opacity: 0,
     scale: 0.5
@@ -84,9 +89,9 @@ const circleVariant = {
     y: 0,
   }
 }
-const hoverAndTapVariant = {
-  hover: { scale:1.5, rotateZ:90 },
-  tap: { scale:1, borderRadius:70 },
+const whileVariants = {
+  hover: { scale:1.5, rotateZ:90, transition:{ duration: 0.4 }},
+  tap: { scale:1, borderRadius:"50%", transition:{ duration: 0.4 }},
 }
 const dragVariant = {
   drag: { backgroundColor: "rgb(46, 204, 113)", transition: { duration: 1 } },
@@ -97,42 +102,77 @@ export default function App() {
   const x = useMotionValue(0)
   // useMotionValue는 framer-motion 요소의 애니메이션 상태를 추적하고 제어한다. 허나, x값이 변한다해서 재렌더링이 일어나진 않음. 기본값은 0   #8.7
   useEffect(()=>{
-    x.onChange(()=>console.log(x.get())) // motionValue x값을 받아오는 방법  #8.8
+    x.onChange(()=>console.log(x.get())) // motionValue x값을 받아오는 방법  #8.7
   },[x])
   return (
-    <Wrapper>
-      {/* <motion.div></motion.div> */}
-      <Box initial={{scale:0}} animate={{scale:1, rotateZ:360}} transition={{type:'spring',delay:0.5}}></Box>
-      <Box variants={rotateVariant} initial="startAnimation" animate="endAnimation"/>
-      <Box variants={scaleVariant} initial="start" animate="end">
-        <Circle variants={circleVariant}/>
-        <Circle variants={circleVariant}/>
-        <Circle variants={circleVariant}/>
-        <Circle variants={circleVariant}/>
-      </Box>
-      <Box variants={hoverAndTapVariant} whileHover="hover" whileTap="tap" onHoverStart={() => console.log('hover started!')}/>
-      {/* <BiggerBox ref={biggerBox}>
-        <Box drag dragSnapToOrigin dragElastic={0.5} dragConstraints={biggerBox} variants={dragVariant} whileDrag="drag"/>
-        <Box drag dragConstraints={{top:-50, bottom:50, left:-50, right:50 }} variants={dragVariant} whileDrag="drag"/>
-      </BiggerBox> */}
-      <DragBox style={{x}} drag="x" dragSnapToOrigin></DragBox>
-      <button onClick={()=>x.set(300)}>click</button>
-    </Wrapper>
+    <FullScreen>
+      <Part>
+      {/* div에 애니메이션 적용시킨다면 <motion.div> 라고 작성해야함  #8.1 */}
+        <Title>motion.div로 motion요소 만들기</Title>
+        <motion.div 
+          style={{width:120, height:120, backgroundColor:"white"}}
+        >
+          <span>motion.div</span>
+        </motion.div>
+      </Part>
+      <Part>
+      {/* motion요소로 애니메이션 적용시키는법 initial={{초기값}} animate={{변화값}} transition={{여러가지 애니메이션 옵션(문서확인)}}  #8.2 */}
+        <Title>styled components로 motion요소 만들기 (styled(motion.div))</Title>
+        <Box 
+          initial={{scale:0.2}} 
+          animate={{scale:1, rotateZ:360}} 
+          transition={{type:'spring', delay:0.5}}
+        />
+      </Part>
+      <Part>
+      {/* motion의 variants 기능을 사용하여 motion요소에 애니메이션 지정하기  #8.3 */}
+        <Title>motion의 variants를 사용하여 motion요소에 애니메이션 지정하기</Title>
+        <Box 
+          variants={firstVariants} 
+          initial="start" 
+          animate="end"
+        />
+      </Part>
+      <Part>
+      {/* initial과 animate의 상속, delayChild + staggerChild로 자식 motion요소에 delay걸기  #8.4 */}
+        <Title>부모 motion요소가 initial='start'와 animate='end'가 있다면 자식 motion요소는 initial,animate를 생략할 수 있다.</Title>
+        <Title>delayChild, staggerChild로 부모 motion요소가 자식 motion요소의 애니메이션을 control할 수 있다.</Title>
+        <Box variants={secondVariants} initial="start" animate="end">
+          <Circle variants={circleVariant}/>
+          <Circle variants={circleVariant}/>
+          <Circle variants={circleVariant}/>
+          <Circle variants={circleVariant}/>
+        </Box>
+      </Part>
+      <Part>
+      {/* WhileHover, WhileTap 등 이벤트리스너를 활용해서 animation을 걸 수 있다.  #8.5 */}
+        <Title>motion의 while~~을 사용하여 motion요소의 이벤트핸들러에 애니메이션 지정하기</Title>
+        <Box 
+          variants={whileVariants} 
+          whileHover="hover" 
+          whileTap="tap" 
+          onHoverStart={() => console.log('hover started!')}
+        />
+      </Part>
+      <Part>
+      {/* drag는 motion요소를 draggable하게 만들어줌(크롬에서 에러발생), dragSnapToOrigin은 motion요소가 드래그 종료시 원위치로 돌아오게함, dragElastic은 드래그 저항력, whileDrag는 drag시 애니메이션을 일으킨다. */}
+      {/* dragConstraints는 드래그 가능범위...biggerBox의 경우 useRef로 인해 ReactJS로 접근이 가능한 요소로 지정해줘야함. #8.5~8.6*/}
+      {/* 각 Box에 drag를 붙혀주어야함. */}
+        <Title>motion요소 drag 구현하기</Title>
+        <BiggerBox ref={biggerBox}>
+          <Box  dragSnapToOrigin dragElastic={0.5} dragConstraints={biggerBox} variants={dragVariant} whileDrag="drag"/>
+        </BiggerBox>
+        <BiggerBox ref={biggerBox}>
+          <Box  dragSnapToOrigin dragConstraints={{top:-50, bottom:50, left:-50, right:50 }} variants={dragVariant} whileDrag="drag"/>
+        </BiggerBox>
+      </Part>
+      <Part>
+      {/* useMotionValue인 x를 Box의 style에 적용함으로써 x는 Box의 animation 상태를 추적하고 컨트롤 할 수 있음.  #8.7 */}
+      {/* x.set(300)으로 x(Box의 x축 값)을 300으로 설정하는 버튼  #8.7  */}
+        <Title>useMotionValue를 사용하여 motion요소의 애니메이션 상태 관리하기</Title>
+        <Box style={{x}} ></Box> 
+        <button onClick={()=>x.set(300)}>click</button>
+      </Part>  
+    </FullScreen>
   );
 }
-
-/*
-104. div에 애니메이션 적용시킨다면 <motion.div> 라고 작성해야함  #8.1
-105. framer-motion으로 애니메이션 적용시키는법 : initial={{초기값}} animate={{변화값}} transition={{여러가지 애니메이션 옵션(문서확인)}}  #8.2
-    - https://motion.dev/docs/react-transitions#duration
-106. framer-motion의 variants 기능을 활용하여 코드를 더욱 간단히 만들기  #8.3
-107~108. variants가 적용된 component는 자식 component에게도 자동으로 initial과 animate가 전해지게 된다. 고로 Circle에는 initial, animate가 생략 가능하다.  #8.4
-113. WhileHover, WhileTap 등 이벤트리스너를 활용해서 animation을 걸 수 있다.  #8.5
-114. BiggerBox를 dragConstraints로 사용하기 위해 ref를 지정  #8.6
-115. drag를 붙히면 drag가능한 요소가 되고, whileDrag를 통해서 animation을 걸 수 있다. (하지만 drag를 붙히는 순간 에러가 발생하여 강의 issue를 생성함)  #8.5
-     dragSnapToOrigin은 드래그 종료 시 원위치 복귀, dragElastic={0~1}은 0일 수록 가운데에서 당기는 힘(중력)이 강해짐  #8.6
-     dragConstraints={biggerBox}는 drag가능한 범위가 biggerBox 내부임을 나타낸다. biggerBox는 useRef로 인해 ReactJS로 접근할 수 있는 DOM요소가 된다.  #8.6
-116. dragConstraints(드래그 가능범위)를 직접 설정하기(비추)  #8.6
-118. useMotionValue인 x를 DragBox의 style에 적용함으로써 x는 DragBox의 animation 상태를 추적하고 컨트롤 할 수 있음.  #8.8
-119. x.set(300)으로 x(DragBox의 x값)을 300으로 설정하는 버튼
-*/

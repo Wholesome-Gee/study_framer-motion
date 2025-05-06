@@ -9,52 +9,60 @@ const Container = styled(motion.div)`
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  gap: 20px;
-`
+`;
 const Box = styled(motion.div)`
-  width: 300px;
-  height: 300px;
+  width: 400px;
+  height: 200px;
   background-color: teal;
-`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  top: 200px;
+  font-size: 28px;
+`;
 
 const boxVariant = {
   start: {
     opacity: 0,
-    scale: 0
+    scale: 0,
+    x: 400
   },
   end: {
     opacity: 1,
     scale: 1,
+    x: 0,
     transition: {
-      duration: 3
+      duration: 0.5
     }
   },
   exit: {
     opacity: 0,
-    y: -200,
+    scale: 0,
+    x: -400,
     transition: {
-      duration: 3
+      duration: 0.5
     }
   }
 }
 
 export default function App() {
-  const [showing, setShowing] = useState(false)
-
-  function toggleShowing() {
-    setShowing((prev)=>!prev)
+  const [page, setPage] = useState(1)
+  function nextPage() {
+    setPage((prev)=>(prev===10 ? 10 : prev+1))
   }
-// <AnimatePresence>는 내부의 component가 사라지는걸(exit) 애니메이트해준다.
-// AnimatePresence의 내부에는 삼항연산문을 사용한 조건문이 있어야한다.
-// exit는 해당 요소가 사라질 때 발생하는 애니메이션
   return (
     <Container>
       <AnimatePresence>
-        {showing? 
-          <Box variants={boxVariant} initial="start" animate="end" exit="exit"/> : null
+        {
+          [1,2,3,4,5,6,7,8,9,10].map((item)=> 
+            item===page ? 
+              <Box variants={boxVariant} initial="start" animate="end" exit="exit" key={item}>{item}</Box> : 
+              null
+          )
         }
       </AnimatePresence>
-      <button onClick={toggleShowing}>{showing ? "hide" : "show"}</button>
+      <button onClick={nextPage}>next Page</button>
     </Container>
   )
 }

@@ -8,7 +8,7 @@
 
 react + typescript : npx create-react-app checklist --template typescript  
 styled-components : npm i styled-components, npm i --save-dev @types/styled-components  
-framer-motion : npm i framer-motion
+framer-motion : npm i motion
 
 🚫 미사용 라이브러리  
 recoil (React v18 이하에서 구동) : npm i recoil  
@@ -112,7 +112,7 @@ const Father = styled(motion.div)`
   height: 120px;
   display: grid;
   grid-template-columns: repeat(2,1fr);
-  background-color: white;
+  background-color: teal;
 `;
 const Child = styled(motion.div)`
   width: 35px;
@@ -127,15 +127,15 @@ const fatherVariant = {
     scale: 0.5
   },
   end: {
-    scale: 1,
     opacity: 1,
+    scale: 1,
     transition:{
       type: 'spring',
       bounce: 0.5,  // 'spring' 전용
       delay: 0.5,
       duration: 2,
-      delayChildren: 2,  // 자식요소 딜레이 설정
-      staggerChildren: 0.4  // 자식요소에게 순차적으로 딜레이 부여
+      delayChildren: 2,  // 자식요소의 애니메이션에 딜레이 설정
+      staggerChildren: 0.4  // 자식요소에게 순차적으로 딜레이 부여 (stargger = 시차를 두다)
     },
   }
 }
@@ -174,7 +174,7 @@ import { motion } from "motion/react"
 const Box = styled(motion.div)` 
   width: 120px;
   height: 120px;
-  background-color: white;
+  background-color: teal;
 `;
 
 const whileVariants = {
@@ -201,20 +201,20 @@ import styled from "styled-components";
 import { motion } from "motion/react"
 import { useRef } from "react";
 
-const Box = styled(motion.div)` 
-  width: 120px;
-  height: 120px;
-  background-color: rgb(0,0,0);
-`;
-const BiggerBox = styled(motion.div)`
-  width: 240px;
-  height: 240px;
+const Container = styled(motion.div)`
+  width: 500px;
+  height: 500px;
   display: flex;
   justify-content: center;
   align-items: center;
   overflow: hidden;
   background-color: rgba(255, 255, 255, 0.4);
 `
+const Box = styled(motion.div)` 
+  width: 100px;
+  height: 100px;
+  background-color: rgb(0,0,0);
+`;
 
 const dragVariant = {
   drag: { backgroundColor: "rgb(46, 204, 113)", transition: { duration: 1 } },
@@ -226,16 +226,16 @@ const dragVariant = {
 // dragConstraints = html요소를 지정하기 위해선 useRef와 ref를 통해 해당 html요소에 접근이 가능하도록 한다.
 // dragElastic = 드래그 저항력을 설정한다. (0~1)
 export default function App() {
-  const biggerBox = useRef(null) 
+  const container = useRef(null) 
   return (
     <>
-      <BiggerBox ref={biggerBox}>
-        <Box drag dragSnapToOrigin dragConstraints={biggerBox} dragElastic={0.5}  variants={dragVariant} whileDrag="drag"/>
-      </BiggerBox>
+      <Container ref={container}>
+        <Box drag dragSnapToOrigin dragConstraints={container} dragElastic={0.5}  variants={dragVariant} whileDrag="drag"/>
+      </Container>
 
-      <BiggerBox ref={biggerBox}>
+      <Container ref={container}>
         <Box drag dragSnapToOrigin dragConstraints={{top:-50, bottom:50, left:-50, right:50 }} dragElastic={1} variants={dragVariant} whileDrag="drag"/>
-      </BiggerBox>
+      </Container>
     </>
   );
 }
@@ -252,7 +252,7 @@ import { motion, useMotionValue, useMotionValueEvent } from "motion/react"
 const Box = styled(motion.div)` 
   width: 120px;
   height: 120px;
-  background-color: white;
+  background-color: teal;
 `;
 // useMotionValue = motion요소의 애니메이션 상태를 추적하고 제어한다. motionValue값이 변해도 재렌더링 X 
 // useMotionValueEvent(motionValueX,"change",(current)=> console.log(current))는 motionValueX가 change 될 때마다 콜백함수((current)=>console.log(current))를 실행한다.
@@ -260,7 +260,7 @@ const Box = styled(motion.div)`
 // motionValueX.set(300) 이런식으로 motionValue값을 컨트롤 가능
 export default function App() {
   const motionValueX = useMotionValue(0)
-  useMotionValueEvent(motionValueX,"change",(current)=>console.log(current)) // motionValue x값을 받아오는 방법  #8.7
+  useMotionValueEvent(motionValueX,"change",(current)=>console.log(current.get())) // motionValue x값을 받아오는 방법  #8.7
   return (
     <>
       <Box style={{ x: motionValueX }}/>
@@ -292,14 +292,15 @@ const Box = styled(motion.div)`
   background-color: white;
 `;
 
-// useTransform(motionValue,조건값,반환값)
+// useTransform(motionValue,조건값,반환값)  => motionValue가 변하면? 그에따른 스타일의 변화를 일으키고 싶을때 사용
+// Component에 drag를 붙혀서 Uncaught Error 뜨면? index.tsx에서 React strict mode를 제거하라
 export default function App() {
   const motionValueX = useMotionValue(0)
   const scaleTransform = useTransform(motionValueX,[-800,0,800],[0.1,1,2])
   const backgroundTransform = useTransform(
     motionValueX, [-800, 800], ["linear-gradient(135deg, rgb(0, 210, 238), rgb(0, 83, 238))", "linear-gradient(135deg, rgb(0, 238, 155), rgb(238, 178, 0))"]
   ) // #8.9
-  useMotionValueEvent(motionValueX,"change",(current)=>{console.log(motionValueX)})
+  useMotionValueEvent(motionValueX,"change",(current)=>{console.log(current)})
   return (
     <Container style={{background:backgroundTransform}}>
       <Box drag="x" style={{x:motionValueX, scale:scaleTransform}}/>
@@ -311,6 +312,7 @@ export default function App() {
 ---
 
 ### #8.9
+
 **📗motion의 useScroll을 사용하여 scroll값에 따른 애니메이션 적용하기**
 ```jsx
 import styled from "styled-components";
@@ -339,4 +341,70 @@ export default function App() {
     </div>
   )
 }
+```
+
+---
+
+### #8.10
+
+**📗svg에 애니메이션 적용하기 (사이트 첫 입장화면 만들때 좋음)**
+```jsx
+import { motion } from "motion/react"
+import styled from "styled-components"
+
+const Container = styled(motion.div)`
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`
+const Svg = styled(motion.svg)`
+  width: 300px;
+  height: 300px;
+`
+
+const svgVariant = {
+  start:{
+    fill: "rgba(0,0,0,0)",  // svg -> path는 fill을 갖고있다. fill은 svg의 색상을 나타낸다
+    pathLength: 0   // svg -< path는 pathLength를 갖고있다. pathLength는 svg의 테두리가 그려진 정도를 나타낸다.
+  },
+  end:{
+    fill: "rgba(0,0,0,1)",
+    pathLength: 1,  
+    transition: {
+      default: {    // svgVariant의 모든 애니메이션의 transition에 기본값을 설정
+        duration: 5
+      },
+      fill: {       // svgVariant의 특정 애니메이션(fill)에 transition을 부여
+        duration: 5,
+        delay: 1.7
+      }
+    }
+  }
+}
+
+// svg는 font-awesome에서 airbnb svg를 가져옴
+// path에 애니메이션을 걸기 위해 <path> -> <motion.path>로 변경
+// svg는 path를 갖고있고 path는 stroke를 갖고있다. stroke는 svg의 테두리 색상을 나타낸다
+// svg는 path를 갖고있고 path는 strokeWidth를 갖고있다. strokeWidth는 svg의 테두리 두께를 나타낸다
+export default function App() {
+  return (
+    <Container>
+      <Svg 
+        xmlns="http://www.w3.org/2000/svg" 
+        viewBox="0 0 448 512"
+      >
+        <motion.path 
+          variants={svgVariant}
+          initial="start"
+          animate="end"
+          stroke="black"
+          strokeWidth="5"
+          d="M224 373.1c-25.2-31.7-40.1-59.4-45-83.2-22.6-88 112.6-88 90.1 0-5.5 24.3-20.3 52-45 83.2zm138.2 73.2c-42.1 18.3-83.7-10.9-119.3-50.5 103.9-130.1 46.1-200-18.9-200-54.9 0-85.2 46.5-73.3 100.5 6.9 29.2 25.2 62.4 54.4 99.5-32.5 36.1-60.6 52.7-85.2 54.9-50 7.4-89.1-41.1-71.3-91.1 15.1-39.2 111.7-231.2 115.9-241.6 15.8-30.1 25.6-57.4 59.4-57.4 32.3 0 43.4 25.9 60.4 59.9 36 70.6 89.4 177.5 114.8 239.1 13.2 33.1-1.4 71.3-37 86.6zm47-136.1C280.3 35.9 273.1 32 224 32c-45.5 0-64.9 31.7-84.7 72.8C33.2 317.1 22.9 347.2 22 349.8-3.2 419.1 48.7 480 111.6 480c21.7 0 60.6-6.1 112.4-62.4 58.7 63.8 101.3 62.4 112.4 62.4 62.9 .1 114.9-60.9 89.6-130.2 0-3.9-16.8-38.9-16.8-39.6z"/>
+      </Svg>
+    </Container>
+  )
+}
+
 ```

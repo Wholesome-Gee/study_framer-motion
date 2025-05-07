@@ -727,7 +727,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
 import styled from "styled-components";
 
-const Wrapper = styled.div`
+const Container = styled.div`
   width: 100vw;
   height: 100vh;
   display: flex;
@@ -771,7 +771,7 @@ export default function App () {
     setClick(click=>!click)
   }
   return (
-    <Wrapper onClick={changeClick}>
+    <Container onClick={changeClick}>
       <Grid>
         <Box layoutId="1"></Box>
         <Box></Box>
@@ -786,7 +786,85 @@ export default function App () {
           null
         }
       </AnimatePresence>
-    </Wrapper>
+    </Container>
   )
 }
 ```
+
+---
+
+### #8.16
+
+**📗layoutId를 사용하여 OverLayout 구현하기 part.2**
+```jsx
+import styled from "styled-components";
+import { motion, AnimatePresence } from "framer-motion";
+import { useState } from "react";
+
+const Container = styled.div`
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  background-color: teal;
+`;
+const Grid = styled.div`
+  width: 50vw;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  div:first-child,
+  div:last-child {
+    grid-column: span 2;
+  }
+`;
+const Box = styled(motion.div)`
+  height: 200px;
+  background-color: rgba(255, 255, 255, 1);
+`;
+const Overlay = styled(motion.div)`
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+
+const overlay = {
+  hidden: { backgroundColor: "rgba(0, 0, 0, 0)" },
+  visible: { backgroundColor: "rgba(0, 0, 0, 0.5)" },
+  exit: { backgroundColor: "rgba(0, 0, 0, 0)" },
+};
+
+function App() {
+  const [id, setId] = useState<null | string>(null);
+  return (
+    <Container>
+      <Grid>
+        {["1", "2", "3", "4"].map((n) => (
+          <Box onClick={() => setId(n)} key={n} layoutId={n} />
+        ))}
+      </Grid>
+      <AnimatePresence>
+        {id ? (
+          <Overlay
+            variants={overlay}
+            onClick={() => setId(null)}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+          >
+            <Box layoutId={id} style={{ width: 400, height: 200 }} />
+          </Overlay>
+        ) : null}
+      </AnimatePresence>
+    </Container>
+  );
+}
+
+export default App;
+```
+
+---

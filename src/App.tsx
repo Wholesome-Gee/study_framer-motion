@@ -1,56 +1,65 @@
-import { motion } from "motion/react"
-import { useState } from "react"
-import styled from "styled-components"
+import { AnimatePresence, motion } from "motion/react";
+import { useState } from "react";
+import styled from "styled-components";
 
-const Container = styled(motion.div)`
+const Wrapper = styled.div`
   width: 100vw;
   height: 100vh;
   display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 50px;
-`;
-const BoxOne = styled(motion.div)<{click:boolean}>`
-  width: 200px;
-  height: 200px;
-  display: flex;
-  justify-content: ${props=>props.click ? "center" : "flex-start"};
-  align-items: ${props=>props.click ? "center" : "flex-start"};
-  background-color: teal;
-`;
-const BoxTwo = styled(motion.div)`
-  width: 200px;
-  height: 200px;
-  display: flex;
-  justify-content: center;
+  justify-content: space-around;
   align-items: center;
   background-color: teal;
-`;
-const Circle= styled(motion.div)`
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  background-color: tomato;
+`
+const Grid = styled.div`
+  width: 50vw;
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  gap: 10px;
+  div:first-child,
+  div:last-child {
+    grid-column: span 2;
+  }
+`
+// grid-column: span 2 는 해당 요소가 2칸을 차지한다는 뜻
+const Box = styled(motion.div)`
+  height: 200px;
+  background-color: rgba(255,255,255,1);
+`
+const Overlay = styled(motion.div)`
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
 `
 
-export default function App() {
+const overlayVariant = {
+  start:{ backgroundColor: 'rgba(0,0,0,0)' },
+  end:{  backgroundColor: 'rgba(0,0,0,0.5)' },
+  exit:{  backgroundColor: 'rgba(0,0,0,0)' }
+}
+export default function App () {
   const [click, setClick] = useState(false)
-  function toggleClick() {
-    setClick((prev)=>!prev)
+  function changeClick(){
+    setClick(click=>!click)
   }
-// layout은 해당 요소의 layout변화에 애니메이션을 자동으로 걸어준다.
-// layoutId는 똑같은 layoutId를 가진 두개 이상의 요소의 상대적 변화에 애니메이션을 걸어준다.
   return (
-    <Container onClick={toggleClick}>
-      <BoxOne click={click}>
-        <Circle layout/>
-      </BoxOne>
-      <BoxTwo>
-        {!click ? <Circle layoutId="1" /> : null}
-      </BoxTwo>
-      <BoxTwo>
-        {click ? <Circle layoutId="1" style={{ scale:4 }}/> : null}
-      </BoxTwo>
-    </Container>
+    <Wrapper onClick={changeClick}>
+      <Grid>
+        <Box layoutId="1"></Box>
+        <Box></Box>
+        <Box></Box>
+        <Box></Box>
+      </Grid>
+      <AnimatePresence>
+        {click ? 
+          <Overlay variants={overlayVariant} initial="start" animate="end" exit="exit" transition={{duration:0.5}}>
+            <Box layout layoutId="1" style={{width:800, height:400}}></Box>
+          </Overlay> : 
+          null
+        }
+      </AnimatePresence>
+    </Wrapper>
   )
 }
